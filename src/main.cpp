@@ -1,3 +1,4 @@
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <cstring>
@@ -18,7 +19,7 @@ constexpr bool enableValidationLayers = false;
 constexpr bool enableValidationLayers = true;
 #endif
 
-class HelloTriangleApplication {
+class AcceleRender {
 public:
   void run() {
     initWindow();
@@ -32,7 +33,40 @@ private:
   // Our global Vulkan instance.
   vk::raii::Instance instance = nullptr;
 
+  vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
+
   GLFWwindow *window = nullptr;
+
+  void setupDebugMessenger() {
+    if (!enableValidationLayers) {
+      return;
+    }
+
+    vk::DebugUtilsMessageSeverityFlagsEXT severityFlags(
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eError);
+    vk::DebugUtilsMessageTypeFlagsEXT messageTypeFlags(
+        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+        vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+        vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation);
+    vk::DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfoEXT{
+        {}, severityFlags, messageTypeFlags, &debugCallback};
+    instance.createDebugUtilsMessengerEXT(debugUtilsMessengerCreateInfoEXT);
+  }
+
+  static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(
+      vk::DebugUtilsMessageSeverityFlagBitsEXT severity,
+      vk::DebugUtilsMessageTypeFlagsEXT type,
+      const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData, void *) {
+    if (severity == vk::DebugUtilsMessageSeverityFlagBitsEXT::eError ||
+        severity == vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
+      std::cerr << "validation layer: type " << to_string(type)
+                << " msg: " << pCallbackData->pMessage << std::endl;
+    }
+
+    return vk::False;
+  }
 
   // Retrieves a list of extensions that are required (if in debug mode).
   std::vector<const char *> getRequiredExtensions() {
@@ -49,7 +83,7 @@ private:
   }
 
   void createInstance() {
-    vk::ApplicationInfo appInfo("Hello Triangle", VK_MAKE_VERSION(1, 0, 0),
+    vk::ApplicationInfo appInfo("AcceleRender", VK_MAKE_VERSION(1, 0, 0),
                                 "No Engine", VK_MAKE_VERSION(1, 0, 0),
                                 VK_API_VERSION_1_0);
 
@@ -59,47 +93,40 @@ private:
     }
 
     auto layerProperties = context.enumerateInstanceLayerProperties();
-    if (std::ranges::any_of(
-            requiredLayers, [&layerProperties](auto const &requiredLayer) {
-              return std::ranges::none_of(
-                  layerProperties, [requiredLayer](auto const &layerProperty) {
-                    return strcmp(layerProperty.layerName, requiredLayer) == 0;
-                  });
-            })) {
-      throw std::runtime_error("Some required layers are not supported!");
+    for (auto const &requiredLayer : requiredLayers) {
+      if (std::ranges::none_of(
+              layerProperties, [requiredLayer](auto const &layerProperty) {
+                return strcmp(layerProperty.layerName, requiredLayer) == 0;
+              })) {
+        throw std::runtime_error("Required layer not supported: " +
+                                 std::string(requiredLayer));
+      }
     }
 
-    uint32_t glfwExtensionCount = 0;
-    const char **glfwExtensions =
-        glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+    auto requiredExtensions = getRequiredExtensions();
 
     auto extensionProperties = context.enumerateInstanceExtensionProperties();
-
-    for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
-      bool found = false;
-      for (const auto &prop : extensionProperties) {
-        if (strcmp(prop.extensionName, glfwExtensions[i]) == 0) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        throw std::runtime_error("Required GLFW extension not supported: " +
-                                 std::string(glfwExtensions[i]));
+    for (auto const &requiredExtension : requiredExtensions) {
+      if (std::ranges::none_of(
+              extensionProperties,
+              [requiredExtension](auto const &extensionProperty) {
+                return strcmp(extensionProperty.extensionName,
+                              requiredExtension) == 0;
+              })) {
+        throw std::runtime_error("Required extension not supported: " +
+                                 std::string(requiredExtension));
       }
     }
 
-    auto extensions = getRequiredExtensions();
     vk::InstanceCreateInfo createInfo{
-        .pApplicationInfo = &appInfo,
-        .enabledLayerCount = static_cast<uint32_t>(requiredLayers.size()),
-        .ppEnabledLayerNames = requiredLayers.data(),
-        .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-        .ppEnabledExtensionNames = extensions.data()};
-
+        {},
+        &appInfo,
+        static_cast<uint32_t>(requiredLayers.size()),
+        requiredLayers.data(),
+        static_cast<uint32_t>(requiredExtensions.size()),
+        requiredExtensions.data()};
     instance = vk::raii::Instance(context, createInfo);
   }
-
   void initWindow() {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -107,7 +134,10 @@ private:
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
   }
 
-  void initVulkan() { createInstance(); }
+  void initVulkan() {
+    createInstance();
+    setupDebugMessenger();
+  }
 
   void mainLoop() {
     while (!glfwWindowShouldClose(window)) {
@@ -123,7 +153,7 @@ private:
 
 int main() {
   try {
-    HelloTriangleApplication app;
+    AcceleRender app;
     app.run();
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
