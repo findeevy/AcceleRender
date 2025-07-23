@@ -3,8 +3,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <stdexcept>
+#include <vector>
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_raii.hpp>
 
@@ -35,7 +37,48 @@ private:
 
   vk::raii::DebugUtilsMessengerEXT debugMessenger = nullptr;
 
+  vk::raii::PhysicalDevice physicalGPU = nullptr;
+
   GLFWwindow *window = nullptr;
+
+  std::vector<const char *> gpuExtensions = {
+      vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
+      vk::KHRSynchronization2ExtensionName,
+      vk::KHRCreateRenderpass2ExtensionName};
+
+  void pickPhysicalGPU() {
+    std::vector<vk::raii::PhysicalDevice> gpus =
+        instance.enumeratePhysicalDevices();
+    const auto devIter = std::ranges::find_if(gpus, [&](auto const &gpu) {
+      auto queueFamilies = gpu.getQueueFamilyProperties();
+      bool isSuitable = gpu.getProperties().apiVersion >= VK_API_VERSION_1_3;
+      const auto qfpIter = std::ranges::find_if(
+          queueFamilies, [](vk::QueueFamilyProperties const &qfp) {
+            return (qfp.queueFlags & vk::QueueFlagBits::eGraphics) !=
+                   static_cast<vk::QueueFlags>(0);
+          });
+      isSuitable = isSuitable && (qfpIter != queueFamilies.end());
+      auto extensions = gpu.enumerateDeviceExtensionProperties();
+      bool found = true;
+      for (auto const &extension : gpuExtensions) {
+        auto extensionIter =
+            std::ranges::find_if(extensions, [extension](auto const &ext) {
+              return strcmp(ext.extensionName, extension) == 0;
+            });
+        found = found && extensionIter != extensions.end();
+      }
+      isSuitable = isSuitable && found;
+      printf("\n");
+      if (isSuitable) {
+        physicalGPU = gpu;
+      }
+      return isSuitable;
+    });
+    if (devIter == gpus.end()) {
+      throw std::runtime_error(
+          "Failed to find a GPU that supports Vulkan 1.3!");
+    }
+  }
 
   void setupDebugMessenger() {
     if (!enableValidationLayers) {
@@ -127,6 +170,7 @@ private:
         requiredExtensions.data()};
     instance = vk::raii::Instance(context, createInfo);
   }
+
   void initWindow() {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -137,6 +181,7 @@ private:
   void initVulkan() {
     createInstance();
     setupDebugMessenger();
+    pickPhysicalGPU();
   }
 
   void mainLoop() {
