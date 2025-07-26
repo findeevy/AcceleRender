@@ -39,12 +39,61 @@ private:
 
   vk::raii::PhysicalDevice physicalGPU = nullptr;
 
+  vk::raii::Device GPU = nullptr;
+
+  vk::raii::Queue graphicsQueue = nullptr;
+
+  vk::PhysicalDeviceFeatures GPUFeatures;
+
   GLFWwindow *window = nullptr;
 
   std::vector<const char *> gpuExtensions = {
       vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
       vk::KHRSynchronization2ExtensionName,
       vk::KHRCreateRenderpass2ExtensionName};
+
+  void pickLogicalGPU() {
+    std::vector<vk::QueueFamilyProperties> queueFamilyProperties =
+        physicalGPU.getQueueFamilyProperties();
+
+    auto graphicsQueueFamilyProperty =
+        std::ranges::find_if(queueFamilyProperties, [](auto const &qfp) {
+          return (qfp.queueFlags & vk::QueueFlagBits::eGraphics) !=
+                 static_cast<vk::QueueFlags>(0);
+        });
+    assert(graphicsQueueFamilyProperty != queueFamilyProperties.end() &&
+           "No graphics queue family found!");
+
+    uint32_t graphicsIndex = static_cast<uint32_t>(std::distance(
+        queueFamilyProperties.begin(), graphicsQueueFamilyProperty));
+
+    vk::StructureChain<vk::PhysicalDeviceFeatures2,
+                       vk::PhysicalDeviceVulkan13Features,
+                       vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>
+        featureChain;
+
+    featureChain.get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering =
+        true;
+    featureChain.get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>()
+        .extendedDynamicState = true;
+
+    float queuePriority = 0.0f;
+    vk::DeviceQueueCreateInfo deviceQueueCreateInfo{};
+    deviceQueueCreateInfo.queueFamilyIndex = graphicsIndex;
+    deviceQueueCreateInfo.queueCount = 1;
+    deviceQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+    vk::DeviceCreateInfo deviceCreateInfo{};
+    deviceCreateInfo.pNext = &featureChain.get<vk::PhysicalDeviceFeatures2>();
+    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
+    deviceCreateInfo.enabledExtensionCount =
+        static_cast<uint32_t>(gpuExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = gpuExtensions.data();
+
+    GPU = vk::raii::Device(physicalGPU, deviceCreateInfo);
+    graphicsQueue = vk::raii::Queue(GPU, graphicsIndex, 0);
+  }
 
   void pickPhysicalGPU() {
     std::vector<vk::raii::PhysicalDevice> gpus =
@@ -122,6 +171,8 @@ private:
       extensions.push_back(vk::EXTDebugUtilsExtensionName);
     }
 
+    extensions.push_back(vk::KHRGetPhysicalDeviceProperties2ExtensionName);
+
     return extensions;
   }
 
@@ -182,6 +233,7 @@ private:
     createInstance();
     setupDebugMessenger();
     pickPhysicalGPU();
+    pickLogicalGPU();
   }
 
   void mainLoop() {
