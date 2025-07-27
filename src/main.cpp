@@ -1,8 +1,10 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -52,10 +54,86 @@ private:
 
   vk::raii::Queue presentQueue = nullptr;
 
+  // Swapchain initialization.
+  vk::raii::SwapchainKHR swapChain = nullptr;
+  std::vector<vk::Image> swapChainImages;
+  vk::Format swapChainImageFormat = vk::Format::eUndefined;
+  vk::Extent2D swapChainExtent;
+
   std::vector<const char *> gpuExtensions = {
       vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
       vk::KHRSynchronization2ExtensionName,
       vk::KHRCreateRenderpass2ExtensionName};
+
+  void createSwapChain() {
+    auto surfaceCapabilities = physicalGPU.getSurfaceCapabilitiesKHR(*surface);
+    auto chosenSurfaceFormat =
+        chooseSwapSurfaceFormat(physicalGPU.getSurfaceFormatsKHR(*surface));
+    swapChainImageFormat = chosenSurfaceFormat.format;
+    auto swapChainColorSpace = chosenSurfaceFormat.colorSpace;
+    swapChainExtent = chooseSwapExtent(surfaceCapabilities);
+    auto minImageCount = std::max(3u, surfaceCapabilities.minImageCount);
+    minImageCount = (surfaceCapabilities.maxImageCount > 0 &&
+                     minImageCount > surfaceCapabilities.maxImageCount)
+                        ? surfaceCapabilities.maxImageCount
+                        : minImageCount;
+    auto presentMode =
+        chooseSwapPresentMode(physicalGPU.getSurfacePresentModesKHR(*surface));
+
+    vk::SwapchainCreateInfoKHR swapChainCreateInfo{};
+    swapChainCreateInfo.surface = *surface;
+    swapChainCreateInfo.minImageCount = minImageCount;
+    swapChainCreateInfo.imageFormat = swapChainImageFormat;
+    swapChainCreateInfo.imageColorSpace = swapChainColorSpace;
+    swapChainCreateInfo.imageExtent = swapChainExtent;
+    swapChainCreateInfo.imageArrayLayers = 1;
+    swapChainCreateInfo.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
+    swapChainCreateInfo.imageSharingMode = vk::SharingMode::eExclusive;
+    swapChainCreateInfo.preTransform = surfaceCapabilities.currentTransform;
+    swapChainCreateInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
+    swapChainCreateInfo.presentMode = presentMode;
+    swapChainCreateInfo.clipped = true;
+
+    swapChain = vk::raii::SwapchainKHR(GPU, swapChainCreateInfo);
+    swapChainImages = swapChain.getImages();
+  }
+
+  vk::Extent2D
+  chooseSwapExtent(const vk::SurfaceCapabilitiesKHR &capabilities) {
+    if (capabilities.currentExtent.width !=
+        std::numeric_limits<uint32_t>::max()) {
+      return capabilities.currentExtent;
+    }
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    return {std::clamp<uint32_t>(width, capabilities.minImageExtent.width,
+                                 capabilities.maxImageExtent.width),
+            std::clamp<uint32_t>(height, capabilities.minImageExtent.height,
+                                 capabilities.maxImageExtent.height)};
+  }
+
+  vk::PresentModeKHR chooseSwapPresentMode(
+      const std::vector<vk::PresentModeKHR> &availablePresentModes) {
+    for (const auto &availablePresentMode : availablePresentModes) {
+      if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
+        return availablePresentMode;
+      }
+    }
+    return vk::PresentModeKHR::eFifo;
+  }
+
+  vk::SurfaceFormatKHR chooseSwapSurfaceFormat(
+      const std::vector<vk::SurfaceFormatKHR> &availableFormats) {
+    for (const auto &availableFormat : availableFormats) {
+      if (availableFormat.format == vk::Format::eB8G8R8A8Srgb &&
+          availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+        return availableFormat;
+      }
+    }
+
+    return availableFormats[0];
+  }
 
   void createSurface() {
     VkSurfaceKHR _surface;
@@ -287,6 +365,7 @@ private:
     createSurface();
     pickPhysicalGPU();
     pickLogicalGPU();
+    createSwapChain();
   }
 
   void mainLoop() {
