@@ -3,18 +3,22 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <string>
 #include <vector>
 #include <vulkan/vk_platform.h>
 #include <vulkan/vulkan_raii.hpp>
 
 const uint32_t WIDTH = 1280;
 const uint32_t HEIGHT = 720;
+
+const std::string SLANG_SHADER = "shaders/shader.slang";
 
 const std::vector validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -66,6 +70,48 @@ private:
       vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
       vk::KHRSynchronization2ExtensionName,
       vk::KHRCreateRenderpass2ExtensionName};
+
+  void createGraphicsPipeline() {
+    vk::raii::ShaderModule shaderModule =
+        createShaderModule(readFile(SLANG_SHADER));
+
+    vk::PipelineShaderStageCreateInfo vertShaderStageInfo{};
+    vertShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
+    vertShaderStageInfo.module = *shaderModule;
+    vertShaderStageInfo.pName = "vertMain";
+
+    vk::PipelineShaderStageCreateInfo fragShaderStageInfo{};
+    fragShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
+    fragShaderStageInfo.module = *shaderModule;
+    fragShaderStageInfo.pName = "fragMain";
+
+    vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo,
+                                                        fragShaderStageInfo};
+  }
+
+  [[nodiscard]] vk::raii::ShaderModule
+  createShaderModule(const std::vector<char> &code) { // Removed const
+    // Fixed: Use standard initialization
+    vk::ShaderModuleCreateInfo createInfo{};
+    createInfo.codeSize = code.size();
+    createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
+
+    vk::raii::ShaderModule shaderModule{GPU, createInfo};
+
+    return shaderModule; // RVO/move handles this properly
+  }
+
+  static std::vector<char> readFile(const std::string &filename) {
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    if (!file.is_open()) {
+      throw std::runtime_error("Failed to open requested file!");
+    }
+    std::vector<char> buffer(file.tellg());
+    file.seekg(0, std::ios::beg);
+    file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+    file.close();
+    return buffer;
+  }
 
   void createImageViews() {
     swapChainImageViews.clear();
@@ -383,6 +429,7 @@ private:
     pickLogicalGPU();
     createSwapChain();
     createImageViews();
+    createGraphicsPipeline();
   }
 
   void mainLoop() {
