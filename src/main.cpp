@@ -60,10 +60,26 @@ private:
   vk::Format swapChainImageFormat = vk::Format::eUndefined;
   vk::Extent2D swapChainExtent;
 
+  std::vector<vk::raii::ImageView> swapChainImageViews;
+
   std::vector<const char *> gpuExtensions = {
       vk::KHRSwapchainExtensionName, vk::KHRSpirv14ExtensionName,
       vk::KHRSynchronization2ExtensionName,
       vk::KHRCreateRenderpass2ExtensionName};
+
+  void createImageViews() {
+    swapChainImageViews.clear();
+    vk::ImageViewCreateInfo imageViewCreateInfo(
+        {}, {}, vk::ImageViewType::e2D, swapChainImageFormat, {},
+        {vk::ImageAspectFlagBits::eColor, 0, 0, 0, 1});
+    for (auto image : swapChainImages) {
+      imageViewCreateInfo.image = image;
+    }
+    for (auto image : swapChainImages) {
+      imageViewCreateInfo.image = image;
+      swapChainImageViews.emplace_back(GPU, imageViewCreateInfo);
+    }
+  }
 
   void createSwapChain() {
     auto surfaceCapabilities = physicalGPU.getSurfaceCapabilitiesKHR(*surface);
@@ -366,6 +382,7 @@ private:
     pickPhysicalGPU();
     pickLogicalGPU();
     createSwapChain();
+    createImageViews();
   }
 
   void mainLoop() {
