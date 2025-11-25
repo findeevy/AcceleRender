@@ -18,15 +18,13 @@
  *       ImGui, or other GUI libraries. It is intended for quick in-terminal
  *       inspection during development.
  *
- * @author Eric Newton (you)
+ * @author Eric Newton
  * @version 1.1
  * @date 2025-11-10
  * @since 1.0
  */
 
-// ====================================================== //
-// Toggle: compile real UI only when PROFILER is defined. //
-// ====================================================== //
+/* Toggle: compile real UI only when PROFILER is defined. */
 #if defined(PROFILER)
 
 // ---------------------------- //
@@ -225,18 +223,17 @@ private:
 
 #else // ======================= NO-OP VERSION ======================= //
 
-// ------------------------------------------------------ //
-// Profiler disabled: UI becomes a no-op (zero overhead). //
-// ------------------------------------------------------ //
-//
-// Rationale: when profiling is disabled we want zero runtime overhead and no
-// console spam. The no-op version preserves the class API so call sites can
-// unconditionally create/use 'ProfilerUI' without littering the codebase
-// with preprocessor checks.
-//
-// This mirrors the pattern used in ChronoProfiler.hpp: the real behavior is
-// compiled under '#if defined(PROFILER)', while here we provide trivial
-// implementations that compile away at optimization time.
+/*
+   Profiler disabled: UI becomes a no-op (zero overhead).
+
+   Rationale: when profiling is disabled we want zero runtime overhead and no
+   console spam. The no-op version preserves the class API so call sites can
+   unconditionally create/use 'ProfilerUI' without littering the codebase
+   with preprocessor checks.
+
+   This mirrors the pattern used in ChronoProfiler.hpp: the real behavior is
+   compiled under '#if defined(PROFILER)', while here we provide trivial
+   implementations that compile away at optimization time. */
 #include <cstddef>
 
 /**

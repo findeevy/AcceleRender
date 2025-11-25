@@ -1,11 +1,8 @@
 #pragma once
 
-// =========================================================== //
-// OPTIONAL PROFILER WRAPPER                                   //
-// Enable profiler by defining -DPROFILER in your build flags. //
-// If NOT defined, everything becomes zero-cost no-op stubs.   //
-// =========================================================== //
-
+/* OPTIONAL PROFILER WRAPPER
+   Enable profiler by defining -DPROFILER in your build flags.
+   If NOT defined, everything becomes zero-cost no-op stubs. */
 #if defined(PROFILER)
 
 // ---------------- REAL PROFILER IMPLEMENTATION ---------------- //
@@ -22,9 +19,6 @@
  * limits, and JSON export for offline analysis.
  */
 
-// ----------------------------- //
-// Includes — Each one explained //
-// ----------------------------- //
 #include <chrono>        ///< High-resolution timers (std::chrono::high_resolution_clock)
 #include <string>        ///< std::string used for thread names and zone categories
 #include <string_view>   ///< std::string_view for lightweight zone names
@@ -69,10 +63,6 @@ public:
         std::string category;  ///< Optional grouping/category for zones
     };
 
-    // ----------------------- //
-    // Frame lifecycle methods //
-    // ----------------------- //
-
     /**
      * @brief Starts a new profiling frame.
      *
@@ -89,10 +79,6 @@ public:
      * normal profiling.
      */
     static void endFrame();
-
-    // -------------------- //
-    // Zone instrumentation //
-    // -------------------- //
 
     /**
      * @brief Marks the start of a profiling zone.
@@ -113,10 +99,6 @@ public:
      * Does nothing if there is no corresponding start (defensive check).
      */
     static void pushEventEnd();
-
-    // --------- //
-    // Accessors //
-    // --------- //
 
     /**
      * @brief Returns merged events for the last completed frame.
@@ -150,10 +132,6 @@ public:
      * @param filename Path to output JSON file
      */
     static void exportToJSON(const std::string& filename);
-
-    // -------------------------------- //
-    // RAII helper for scoped profiling //
-    // -------------------------------- //
 
     /**
      * @class ScopedZone
@@ -203,9 +181,6 @@ public:
     };
 
 private:
-    // --------------------
-    // Internal state
-    // --------------------
 
     /** @brief Thread-local event list for each thread. */
     static thread_local std::vector<Event> threadEvents;
@@ -252,17 +227,15 @@ private:
 
 #else
 
-// ----------------------------------------------------------------------- //
-// FAKE / NO-OP PROFILER IMPLEMENTATION (when PROFILER is NOT defined)     //
-//                                                                         //
-// This version satisfies the compiler and ensures that ALL profiler calls //
-// (ChronoProfiler::ScopedFrame, ScopedZone, PROFILE_SCOPE) compile with   //
-// *zero overhead* and without modifying any call sites.                   //
-//                                                                         //
-// + Requires NO code changes anywhere else in the engine                  //
-// + Eliminates all profiling logic at compile time                        //
-// + Ensures symbols still exist so linking never breaks                   //
-// ----------------------------------------------------------------------- //
+
+/* FAKE / NO-OP PROFILER IMPLEMENTATION (when PROFILER is NOT defined)
+   This version satisfies the compiler and ensures that ALL profiler calls
+   (ChronoProfiler::ScopedFrame, ScopedZone, PROFILE_SCOPE) compile with
+   *zero overhead* and without modifying any call sites.
+
+   + Requires NO code changes anywhere else in the engine
+   + Eliminates all profiling logic at compile time
+   + Ensures symbols still exist so linking never breaks */
 
 #include <vector>
 #include <string>
@@ -305,10 +278,6 @@ public:
         double durationMs = 0.0;
     };
 
-    // ----------------------- //
-    // Frame lifecycle (no-op) //
-    // ----------------------- //
-
     /**
      * @brief Begin a new profiling frame.
      *
@@ -323,10 +292,6 @@ public:
      * Does nothing. Exists solely for API symmetry.
      */
     static void endFrame() {}
-
-    // ----------------------- //
-    // Event recording (no-op) //
-    // ----------------------- //
 
     /**
      * @brief Begin recording a profiling zone.
@@ -343,10 +308,6 @@ public:
      * No stack tracking, no timings, no dependencies.
      */
     static void pushEventEnd() {}
-
-    // ------------------------------------------- //
-    // Accessors (always return safe empty result) //
-    // ------------------------------------------- //
 
     /**
      * @brief Return the list of recorded events (always empty).
@@ -381,10 +342,6 @@ public:
      * @param filename Filename to write JSON to (ignored)
      */
     static void exportToJSON(const std::string& /*filename*/) {}
-
-    // ------------------------------------------------------------- //
-    // RAII helpers — identical API to real profiler, but do nothing //
-    // ------------------------------------------------------------- //
 
     /**
      * @class ScopedZone
