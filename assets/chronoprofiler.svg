@@ -10,10 +10,10 @@
     <line x1="100" y1="100" x2="150" y2="100" stroke="#64C8FF" stroke-width="3" stroke-linecap="round" />
 
     <!-- CPU / frame bars -->
-    <rect x="40" y="140" width="18" height="40" fill="#64C8FF" />
-    <rect x="70" y="130" width="18" height="50" fill="#FFFFFF" />
-    <rect x="100" y="120" width="18" height="60" fill="#64C8FF" />
-    <rect x="130" y="135" width="18" height="45" fill="#FFFFFF" />
+    <rect x="40" y="145" width="18" height="40" fill="#64C8FF" />
+    <rect x="70" y="135" width="18" height="50" fill="#FFFFFF" />
+    <rect x="100" y="125" width="18" height="60" fill="#64C8FF" />
+    <rect x="130" y="140" width="18" height="45" fill="#FFFFFF" />
 
     <!-- title -->
     <text x="50%" y="210" text-anchor="middle" fill="#FFFFFF" font-family="Verdana" font-size="18" font-weight="bold">

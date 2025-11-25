@@ -2,11 +2,11 @@
 
 /**
  * @file ChronoProfiler.cpp
- * @brief Implementation of ChronoProfiler with optional features.
+ * @brief Implementation of ChronoProfiler w/ optional features...
  *
  * @details
- * This file implements the ChronoProfiler, a lightweight, real-time CPU
- * profiler that supports per-thread, per-frame timing of named code zones.
+ * ChronoProfiler is a lightweight, real-time CPU profiler that supports
+ * per-thread, per-frame timing of named code zones.
  *
  * Optional features implemented here include:
  *  - Thread names for UI labeling
@@ -15,23 +15,21 @@
  *  - JSON export for offline analysis
  *  - Runaway event prevention and total event tracking
  *
- * @note This implementation uses standard C++ libraries:
+ * @note The implementation uses standard C++ libraries:
  *  - '<chrono>' for high-resolution timing
  *  - '<vector>' and '<unordered_map>' for storage
  *  - '<thread>' and '<mutex>' for thread safety
  *  - '<atomic>' for atomic counters
  *  - '<fstream>' and '<iomanip>' for JSON export
  *  - 'nlohmann/json.hpp' (external) for JSON serialization
+ *
+ * @authors Eric Newton
  */
 
 #include <fstream>           ///< std::ofstream for file output
-#include <iomanip>           ///< std::setw for pretty JSON formatting
-#include <nlohmann/json.hpp> ///< External library for JSON export
-#include <sstream>           ///< std::stringstream for string formatting
-
-// -------------- //
-// Static storage //
-// -------------- //
+#include <iomanip>           ///< std::setw for JSON format
+#include <nlohmann/json.hpp> ///< external library for JSON export
+#include <sstream>           ///< std::stringstream for string format
 
 /** @brief Thread-local event list for each thread. Each thread writes to its
  * own vector to avoid locks. */
@@ -60,44 +58,35 @@ std::atomic<size_t> ChronoProfiler::totalEventCount{0};
 std::vector<std::vector<ChronoProfiler::Event> *>
     ChronoProfiler::allThreadBuffers;
 
-// ------------------------------------- //
-// Utility: current time in milliseconds //
-// ------------------------------------- //
-
 /**
- * @brief Get the current timestamp in milliseconds since the epoch.
- * @return High-resolution timestamp in milliseconds (double-precision)
+ * @brief Get current timestamp in milliseconds (since the epoch.
+ * @return High-resolution timestamp in milliseconds (double-precision).
  *
  * @details Uses 'std::chrono::high_resolution_clock' to provide accurate timing
- *          for profiling events. This is used internally to compute event
- * durations.
+ *          for profiling events. Used internally to compute event durations.
  */
 double ChronoProfiler::nowMs() {
   using namespace std::chrono;
-  // Return current time in milliseconds
+
+  // return current time in milliseconds
   return duration<double, std::milli>(
              high_resolution_clock::now().time_since_epoch())
       .count();
 }
 
-// --------------- //
-// Frame lifecycle //
-// --------------- //
-
 /**
  * @brief Begin a new profiling frame.
  *
- * @details
- * This should be called at the start of each frame (e.g., game/render loop).
- * Clears previous frame events and resets the total event counter.
+ * @details Should be called at the start of each frame (e.g., game/render loop).
+ *          Clears previous frame events & resets the total event counter.
  *
- * @note Locks are used here to safely clear the shared frameEvents vector.
+ * @note Locks are used to safely clear the shared frameEvents vector.
  */
 void ChronoProfiler::beginFrame() {
   frameStart =
-      std::chrono::high_resolution_clock::now(); // Record frame start time
+      std::chrono::high_resolution_clock::now(); // record frame start time
 
-  std::lock_guard<std::mutex> lock(mergeMutex); // Protect shared frameEvents
+  std::lock_guard<std::mutex> lock(mergeMutex); // protect shared frameEvents
   frameEvents.clear();
   totalEventCount = 0;
 }
@@ -105,43 +94,38 @@ void ChronoProfiler::beginFrame() {
 /**
  * @brief End the current profiling frame.
  *
- * @details
- * Merges thread-local buffers from all threads into 'frameEvents' for the
- * current frame. Each thread-local buffer is cleared after merging.
+ * @details Merges thread-local buffers from all threads into 'frameEvents'
+ *          for the current frame. Each thread-local buffer is cleared after merging.
  *
  * @note Locking occurs here to ensure thread-safe merging.
  */
 void ChronoProfiler::endFrame() {
-  std::lock_guard<std::mutex> lock(mergeMutex); // Ensure thread-safe merge
+  std::lock_guard<std::mutex> lock(mergeMutex); // ensure thread-safe merge
 
   for (auto *buffer : allThreadBuffers) {
     frameEvents.insert(frameEvents.end(), buffer->begin(), buffer->end());
-    buffer->clear(); ///< Clear thread-local buffer for next frame
+    buffer->clear(); ///< clear thread-local buffer for next frame
   }
 }
-
-// -------------------- //
-// Zone instrumentation //
-// -------------------- //
 
 /**
  * @brief Start a profiling zone for the current thread.
  *
  * @param name Zone name (caller-owned string)
- * @param color Optional RGBA color for visualization (default 0x64C8FFFF)
+ * @param color Optional RGBA color for visualization (default=0x64C8FFFF)
  * @param category Optional string category for grouping zones in UI
  *
- * @details
- * Creates an Event object and pushes it onto the thread-local vector. Duration
- * is calculated later when 'pushEventEnd()' is called.
+ * @details Creates an Event object and pushes it onto the thread-local vector.
+ *          Duration is calculated when 'pushEventEnd()' is called.
  *
- * @note Each thread registers its local buffer only once using a thread-local
- * static lambda.
+ * @note Each thread registers its local buffer only once using a
+ *       thread-local static lambda.
+ *
  * @note Prevents runaway growth using 'kMaxEventsPerThread'.
  */
 void ChronoProfiler::pushEventStart(std::string_view name, uint32_t color,
                                     const std::string &category) {
-  // Register this thread's buffer once
+  // register this thread's buffer only once
   static thread_local bool registered = []() -> bool {
     std::lock_guard<std::mutex> lock(mergeMutex);
     allThreadBuffers.push_back(&threadEvents);
@@ -149,28 +133,27 @@ void ChronoProfiler::pushEventStart(std::string_view name, uint32_t color,
   }();
 
   if (threadEvents.size() >= kMaxEventsPerThread) {
-    return; ///< Prevent runaway growth
+    return; ///< prevent runaway growth
   }
 
   Event evt{};
   evt.name = name;
   evt.startMs = nowMs();
-  evt.durationMs = -1.0; ///< Duration unknown until pushEventEnd()
+  evt.durationMs = -1.0; ///< duration unknown until pushEventEnd()
   evt.threadId = static_cast<uint32_t>(
       std::hash<std::thread::id>{}(std::this_thread::get_id()));
   evt.color = color;
   evt.category = category;
 
-  threadEvents.push_back(evt); // Store event in thread-local buffer
-  totalEventCount++;           // Increment global event counter
+  threadEvents.push_back(evt); // store event in thread-local buffer
+  totalEventCount++;           // increment global event counter
 }
 
 /**
  * @brief End the most recent profiling zone for the current thread.
  *
- * @details
- * Calculates the duration of the zone and converts the start time to be
- * relative to 'frameStart'.
+ * @details Calculates the duration of the zone and converts the start time
+ *          to be relative to 'frameStart'.
  *
  * @note Does nothing if there are no events in the thread-local buffer.
  */
@@ -180,17 +163,13 @@ void ChronoProfiler::pushEventEnd() {
 
   Event &evt = threadEvents.back();
   double endTimeMs = nowMs();
-  evt.durationMs = endTimeMs - evt.startMs; // Compute how long the event lasted
+  evt.durationMs = endTimeMs - evt.startMs; // compute how long the event lasted
 
-  // Adjust start time to be relative to the beginning of the frame
+  // adjust start time to be relative to the beginning of the frame
   evt.startMs -=
       std::chrono::duration<double, std::milli>(frameStart.time_since_epoch())
           .count();
 }
-
-// --------- //
-// Accessors //
-// --------- //
 
 /**
  * @brief Retrieve all finalized events for the last completed frame.
@@ -201,10 +180,6 @@ void ChronoProfiler::pushEventEnd() {
 const std::vector<ChronoProfiler::Event> &ChronoProfiler::getEvents() {
   return frameEvents;
 }
-
-// ------------- //
-// Thread naming //
-// ------------- //
 
 /**
  * @brief Assign a human-readable name to the current thread.
@@ -217,7 +192,7 @@ void ChronoProfiler::setThreadName(const std::string &name) {
   uint32_t id = static_cast<uint32_t>(
       std::hash<std::thread::id>{}(std::this_thread::get_id()));
   std::lock_guard<std::mutex> lock(threadNamesMutex);
-  threadNames[id] = name; // Map thread ID to name
+  threadNames[id] = name; // map thread ID to name
 }
 
 /**
@@ -226,17 +201,13 @@ void ChronoProfiler::setThreadName(const std::string &name) {
  * @return Thread name string if set, otherwise "<unnamed>"
  */
 std::string ChronoProfiler::getThreadName(uint32_t threadId) {
-  // Ensure thread-safe access to threadNames map
+  // ensure thread-safe access to threadNames map
   std::lock_guard<std::mutex> lock(threadNamesMutex);
-  auto it = threadNames.find(threadId); // Look up the thread ID
+  auto it = threadNames.find(threadId); // look up the thread ID
   return (it != threadNames.end())
              ? it->second
-             : "<unnamed>"; // Return name if found, else "<unnamed>"
+             : "<unnamed>"; // return name if found, else "<unnamed>"
 }
-
-// ----------- //
-// JSON export //
-// ----------- //
 
 /**
  * @brief Export current frame events to a JSON file.
@@ -249,7 +220,7 @@ void ChronoProfiler::exportToJSON(const std::string &filename) {
   nlohmann::json j; // JSON array to store all frame events
 
   for (const auto &evt : frameEvents) {
-    // Add event details to the JSON array
+    // add event details to the JSON array
     j.push_back({{"name", evt.name},
                  {"startMs", evt.startMs},
                  {"durationMs", evt.durationMs},
@@ -259,8 +230,8 @@ void ChronoProfiler::exportToJSON(const std::string &filename) {
                  {"category", evt.category}});
   }
 
-  std::ofstream ofs(filename); // Open the file for writing
+  std::ofstream ofs(filename); // open the file for writing
   if (ofs.is_open()) {
-    ofs << std::setw(2) << j << std::endl; // Write formatted JSON to file
+    ofs << std::setw(2) << j << std::endl; // write formatted JSON to file
   }
 }

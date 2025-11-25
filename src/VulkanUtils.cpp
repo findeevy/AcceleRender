@@ -1,9 +1,23 @@
+/**
+ * @file VulkanUtils.cpp
+ * @brief Utility helper functions for common Vulkan operations.
+ *
+ * This file contains reusable Vulkan helper functions:
+ * - Reading SPIR-V shader binaries from disk
+ * - Creating Vulkan image views
+ *
+ * @note Part of the vkutils module.
+ */
 #include "../include/VulkanUtils.hpp"
 #include <fstream>
 #include <stdexcept>
 #include <vector>
 #include <vulkan/vulkan_raii.hpp>
 
+/**
+ * @namespace vkutils
+ * @brief Collection of utility functions for Vulkan resource management.
+ */
 namespace vkutils {
 
 /**
@@ -13,9 +27,9 @@ namespace vkutils {
  * other binary assets into memory. The file is opened in binary mode and read
  * into a contiguous buffer of bytes.
  *
- * @param filename Path to the file to read (e.g., "shaders/vert.spv").
- * @return A std::vector<char> containing the raw file bytes.
- * @throws std::runtime_error if the file cannot be opened.
+ * @param filename Path to the file to read (e.g., "shaders/vert.spv")
+ * @return A std::vector<char> containing the raw file bytes
+ * @throws std::runtime_error if the file cannot be opened
  *
  * @note Uses std::ios::ate to determine the file size efficiently.
  * @example
@@ -47,15 +61,15 @@ std::vector<char> readFile(const std::string &filename) {
  * default, and the caller can specify the format, aspect mask, and mip level
  * count.
  *
- * @param device Logical Vulkan device used to create the image view.
- * @param image Vulkan image handle wrapped in vk::raii::Image.
- * @param format Format of the image (e.g., vk::Format::eR8G8B8A8Srgb).
+ * @param device Logical Vulkan device used to create the image view
+ * @param image Vulkan image handle wrapped in vk::raii::Image
+ * @param format Format of the image (e.g., vk::Format::eR8G8B8A8Srgb)
  * @param aspectFlags Aspect mask specifying which parts of the image are
- * accessible (e.g., vk::ImageAspectFlagBits::eColor).
- * @param mipLevels Number of mipmap levels in the image (default is 1).
- * @return A vk::raii::ImageView object managing the created view.
+ *        accessible (e.g., vk::ImageAspectFlagBits::eColor)
+ * @param mipLevels Number of mipmap levels in the image (default is 1)
+ * @return A vk::raii::ImageView object managing the created view
  *
- * @throws vk::SystemError if Vulkan creation fails.
+ * @throws vk::SystemError if Vulkan creation fails
  *
  * @example
  * @code
@@ -86,4 +100,4 @@ vk::raii::ImageView createImageView(const vk::raii::Device &device,
   return vk::raii::ImageView(device, viewInfo);
 }
 
-} // namespace vkutils
+} // end of namespace vkutils

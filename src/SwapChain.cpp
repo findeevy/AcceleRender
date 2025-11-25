@@ -1,7 +1,16 @@
+/**
+ * @file SwapChain.cpp
+ * @brief Implementation of Vulkan swap chain management for the renderer.
+ *        Part of an in-progress refactor to isolate SwapChain functionality
+ *        out of render.cpp...
+ *
+ * @note The SwapChain must be recreated when the window is resized or when the
+ * surface becomes invalid (e.g., VK_ERROR_OUT_OF_DATE_KHR).
+ */
 #include "SwapChain.hpp"
 #include "../include/VulkanUtils.hpp"
-#include <algorithm> // for std::max
-#include <limits>    // for std::numeric_limits
+#include <algorithm>
+#include <limits>
 #include <vector>
 
 /**
@@ -17,68 +26,64 @@
  * 5. Retrieve raw swap chain images and create RAII-wrapped image objects so we
  * can create corresponding image views (one per swap chain image).
  *
- * Important notes:
- * - This function can throw on Vulkan errors (vk::SystemError) when creating
- * the swapchain or image views. Callers are responsible for handling exceptions
- * appropriately.
- * - RAII objects hold references to the device; do not destroy the device
- * before the swapchain.
+ * @note This function can throw on Vulkan errors (vk::SystemError) when
+ *       creating the swapchain or image views. Callers are responsible
+ *       for handling exceptions appropriately.
+ * @note RAII objects hold references to the device; do not destroy
+ *       the device before the swapchain.
  *
  * @throws vk::SystemError if swap chain or image view creation fails.
  * @see recreate()
  * @see cleanup()
  */
 void SwapChain::create() {
-  // Query the current surface capabilities for the given physical GPU and
-  // surface. This provides supported min/max image counts, currentTransform,
-  // extents, etc.
+  /* Query the current surface capabilities for the given physical GPU and
+     surface. */
   auto surfaceCapabilities = physicalGPU.getSurfaceCapabilitiesKHR(*surface);
 
-  // Pick the best surface format (color format + color space) available.
-  // This determines pixel format and color space used when presenting images.
+  /* Pick the best surface format (color format + color space) available. */
   auto chosenSurfaceFormat =
       chooseSwapSurfaceFormat(physicalGPU.getSurfaceFormatsKHR(*surface));
   swapChainImageFormat = chosenSurfaceFormat.format;
   swapChainSurfaceFormat = chosenSurfaceFormat;
   auto swapChainColorSpace = chosenSurfaceFormat.colorSpace;
 
-  // Choose the resolution (extent) for swapchain images.
-  // If the windowing system specifies a fixed extent we must use it.
+  /* Choose the resolution (extent) for swapchain images. */
   swapChainExtent = chooseSwapExtent(surfaceCapabilities);
 
-  // Decide how many images the swapchain should have.
-  // Using more images can increase GPU/CPU parallelism; many examples use 2
-  // or 3. Here we prefer 3 for extra buffering, but respect the device's
-  // maximum.
+  /* Decide how many images the swapchain should have.
+     Using more images can increase GPU/CPU parallelism; many examples use 2
+     or 3. Here we prefer 3 for extra buffering, but respect the device's
+     maximum. */
   uint32_t minImageCount = std::max(3u, surfaceCapabilities.minImageCount);
   if (surfaceCapabilities.maxImageCount > 0 &&
       minImageCount > surfaceCapabilities.maxImageCount) {
-    // Cap at the GPU's maximum if it specifies one (0 means no limit).
+    /* cap at the GPU's maximum if it specifies one (0 means no limit). */
     minImageCount = surfaceCapabilities.maxImageCount;
   }
 
-  // Choose a present mode based on what the platform and driver support.
-  // mailbox is preferred (low latency, no tearing), fallback to FIFO which is
-  // guaranteed.
+  /* Choose a present mode based on what the platform and driver support.
+     mailbox is preferred (low latency, no tearing), fallback to FIFO which is
+     guaranteed. */
   auto presentMode =
       chooseSwapPresentMode(physicalGPU.getSurfacePresentModesKHR(*surface));
 
-  // Fill in the standard fields for swapchain creation.
-  // Each field here controls a specific behavior:
-  // - surface: which window/screen to present to
-  // - minImageCount: number of images in swapchain
-  // - imageFormat / imageColorSpace: pixel layout
-  // - imageExtent: resolution
-  // - imageArrayLayers: usually 1 for 2D rendering
-  // - imageUsage: how we intend to use the images (color attachment for
-  // rendering)
-  // - imageSharingMode: exclusive is fastest for single-queue families
-  // - preTransform: rotation/transform applied by the surface (use
-  // currentTransform)
-  // - compositeAlpha: how alpha is handled with other windows (opaque by
-  // default)
-  // - presentMode: vsync / mailbox / immediate behavior
-  // - clipped: allow discarding pixels obscured by other windows (true)
+  /* Fill in the standard fields for swapchain creation.
+     Each field here controls a specific behavior:
+     - surface: which window/screen to present to
+     - minImageCount: number of images in swapchain
+     - imageFormat / imageColorSpace: pixel layout
+     - imageExtent: resolution
+     - imageArrayLayers: usually 1 for 2D rendering
+     - imageUsage: how we intend to use the images (color attachment for
+                   rendering)
+     - imageSharingMode: exclusive is fastest for single-queue families
+     - preTransform: rotation/transform applied by the surface (use
+                     currentTransform)
+     - compositeAlpha: how alpha is handled with other windows (opaque by
+                       default)
+     - presentMode: vsync / mailbox / immediate behavior
+     - clipped: allow discarding pixels obscured by other windows (true) */
   vk::SwapchainCreateInfoKHR swapChainCreateInfo;
   swapChainCreateInfo.surface = *surface;
   swapChainCreateInfo.minImageCount = minImageCount;
@@ -93,45 +98,37 @@ void SwapChain::create() {
   swapChainCreateInfo.presentMode = presentMode;
   swapChainCreateInfo.clipped = true;
 
-  // Create the RAII swapchain object. vk::raii::SwapchainKHR will free itself
-  // when it goes out of scope or is assigned nullptr (see cleanup()).
+  /* Create the RAII swapchain object. vk::raii::SwapchainKHR will free itself
+     when it goes out of scope or is assigned nullptr (see cleanup()). */
   swapChain = vk::raii::SwapchainKHR(device, swapChainCreateInfo);
 
-  // Retrieve the raw vk::Image handles owned by the swapchain.
+  /* Retrieve the raw vk::Image handles owned by the swapchain. */
   swapChainImages = swapChain.getImages();
 
-  // Wrap the raw images in RAII Image objects so we can safely manage their
-  // lifetime when creating ImageViews. Note: these RAII images simply provide
-  // RAII semantics for the handle, they do not allocate memory — swapchain
-  // images are owned by the swapchain.
+  /* Wrap the raw images in RAII Image objects so we can safely manage their
+     lifetime when creating ImageViews. */
   std::vector<vk::raii::Image> raiiSwapChainImages;
   raiiSwapChainImages.reserve(swapChainImages.size());
   for (auto &img : swapChainImages) {
-    // Construct a RAII wrapper around the raw image handle (img).
-    // We pass the logical device and the VkImage handle.
+    /* Construct a RAII wrapper around the raw image handle (img). */
     raiiSwapChainImages.emplace_back(device, img);
   }
 
-  // Create an image view for each swapchain image. Image views describe how
-  // shaders will access image data (format, subresource range, etc.). We store
-  // RAII-wrapped ImageView objects in swapChainImageViews. Clearing here
-  // ensures repeated create() calls (e.g., during recreation) do not leak
-  // previous views.
+  /* Create an image view for each swapchain image. Image views describe how
+     shaders will access image data (format, subresource range, etc.). We store
+     RAII-wrapped ImageView objects in swapChainImageViews. Clearing here
+     ensures repeated create() calls (e.g., during recreation) do not leak
+     previous views. */
   swapChainImageViews.clear();
   swapChainImageViews.reserve(raiiSwapChainImages.size());
   for (auto &image : raiiSwapChainImages) {
-    // Use the utility helper to create a view; this centralizes consistent
-    // creation flags.
+    /* Use the utility helper to create a view; this centralizes consistent
+       creation flags. */
     swapChainImageViews.emplace_back(
         vkutils::createImageView(device, image, swapChainImageFormat,
                                  vk::ImageAspectFlagBits::eColor, 1));
   }
 
-  // Note: raiiSwapChainImages temporaries will be destroyed at the end of this
-  // function, but the ImageView objects created above hold the necessary
-  // references because they are created using the device and underlying VkImage
-  // handles. Ensure the device and swapChain outlive the image views; otherwise
-  // you will have dangling handles.
 }
 
 /**
@@ -149,12 +146,12 @@ void SwapChain::create() {
  * @see recreate()
  */
 void SwapChain::cleanup() {
-  // Explicitly destroy image views now (clear invokes destructors of the RAII
-  // objects).
+  /* Explicitly destroy image views now (clear invokes destructors of the RAII
+     objects). */
   swapChainImageViews.clear();
 
-  // Reset the swapChain RAII wrapper. Assigning nullptr or default-constructed
-  // RAII wrapper releases the VkSwapchainKHR resource immediately.
+  /* Reset the swapChain RAII wrapper. Assigning nullptr or default-constructed
+     RAII wrapper releases the VkSwapchainKHR resource immediately. */
   swapChain = nullptr;
 }
 
@@ -165,17 +162,11 @@ void SwapChain::cleanup() {
  * - On framebuffer resize, call recreate() to re-query surface capabilities and
  *   rebuild the swap chain and image views to match the new window size.
  *
- * Note: More robust implementations may need to wait for the device to become
- * idle or to free other resources (framebuffers, pipelines) that depend on the
- * swapchain.
- *
  * @see create()
  * @see cleanup()
  */
 void SwapChain::recreate() {
-  // Simple approach: destroy existing resources then create new ones.
-  // In a production renderer you'd likely wait for the device to be idle and
-  // free dependent objects (framebuffers, command buffers, etc.) first.
+  /* Simple approach: destroy existing resources then create new ones. */
   cleanup();
   create();
 }
@@ -196,17 +187,17 @@ void SwapChain::recreate() {
  */
 vk::Extent2D
 SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR &capabilities) {
-  // If the surface sets a fixed extent, use it.
+  /* if the surface sets a fixed extent, use it. */
   if (capabilities.currentExtent.width !=
       std::numeric_limits<uint32_t>::max()) {
     return capabilities.currentExtent;
   } else {
-    // Fallback default; in a real application you should query the actual
-    // window size (e.g., from GLFW) and use that instead of a hard-coded
-    // 800x600.
+    /* fallback default; in a real application you should query the actual
+       window size (e.g., from GLFW) and use that instead of a hard-coded
+       800x600. */
     vk::Extent2D actualExtent = {800, 600}; // Default fallback
 
-    // Clamp the fallback to the allowed range.
+    /* clamp the fallback to the allowed range. */
     actualExtent.width =
         std::clamp(actualExtent.width, capabilities.minImageExtent.width,
                    capabilities.maxImageExtent.width);
@@ -226,11 +217,9 @@ SwapChain::chooseSwapExtent(const vk::SurfaceCapabilitiesKHR &capabilities) {
  * - eImmediate: may present images immediately and can tear (not recommended).
  * - eFifo: guaranteed to be available on all platforms; behaves like vsync.
  *
- * We prefer mailbox when available, otherwise fallback to FIFO for portability.
- *
  * @param availablePresentModes List of supported present modes returned by the
- * driver.
- * @return The chosen vk::PresentModeKHR (mailbox preferred, otherwise FIFO).
+ *        driver
+ * @return The chosen vk::PresentModeKHR (mailbox preferred, otherwise FIFO)
  */
 vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
     const std::vector<vk::PresentModeKHR> &availablePresentModes) {
@@ -239,7 +228,7 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
       return mode;
     }
   }
-  // FIFO is required to be supported on all Vulkan implementations.
+  /* FIFO is required to be supported on all Vulkan implementations. */
   return vk::PresentModeKHR::eFifo;
 }
 
@@ -250,12 +239,8 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
  * - VK_FORMAT_B8G8R8A8_SRGB with sRGB nonlinear color space for correct color
  *   reproduction on most platforms.
  *
- * If that specific format is not available we return the first available
- * option. In a more advanced implementation you could score formats based on
- * color depth, linear vs sRGB, and device support.
- *
- * @param availableFormats List of supported surface formats.
- * @return The chosen vk::SurfaceFormatKHR.
+ * @param availableFormats List of supported surface formats
+ * @return The chosen vk::SurfaceFormatKHR
  */
 vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(
     const std::vector<vk::SurfaceFormatKHR> &availableFormats) {
@@ -265,6 +250,6 @@ vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(
       return format;
     }
   }
-  // Fallback: return whatever the driver exposes first.
+  /* fallback: return whatever the driver exposes first. */
   return availableFormats[0];
 }
