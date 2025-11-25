@@ -1,6 +1,6 @@
 <map id="include/UniformBufferObject.hpp" name="include/UniformBufferObject.hpp">
 <area shape="rect" id="node1" title="Defines the UniformBufferObject struct used to pass transformation matrices to shaders." alt="" coords="7,5,242,31"/>
 <area shape="rect" id="node2" href="$render_8hpp.html" title=" " alt="" coords="53,79,196,104"/>
-<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for the Accelerender Vulkan&#45;based renderer." alt="" coords="5,152,111,177"/>
+<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for Accelerender." alt="" coords="5,152,111,177"/>
 <area shape="rect" id="node4" href="$render_8cpp.html" title="VulkanRenderer class implementation for Accelerender." alt="" coords="135,152,248,177"/>
 </map>

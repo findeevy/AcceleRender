@@ -97,7 +97,7 @@ $(document).ready(function(){initNavTree('main_8cpp.html',''); initResizable(); 
 </div><!--header-->
 <div class="contents">
 
-<p>Entry point for the Accelerender Vulkan-based renderer.  
+<p>Entry point for Accelerender.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="render_8hpp_source.html">../include/render.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -105,7 +105,7 @@ Include dependency graph for main.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="main_8cpp__incl.png" border="0" usemap="#asrc_2main_8cpp" alt=""/></div>
 <map name="asrc_2main_8cpp" id="asrc_2main_8cpp">
-<area shape="rect" title="Entry point for the Accelerender Vulkan&#45;based renderer." alt="" coords="893,5,998,31"/>
+<area shape="rect" title="Entry point for Accelerender." alt="" coords="893,5,998,31"/>
 <area shape="rect" href="render_8hpp.html" title=" " alt="" coords="868,79,1023,104"/>
 <area shape="rect" title=" " alt="" coords="5,152,91,177"/>
 <area shape="rect" title=" " alt="" coords="95,299,161,324"/>
@@ -152,10 +152,9 @@ Functions</h2></td></tr>
 <tr class="separator:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Entry point for the Accelerender Vulkan-based renderer. </p>
+<div class="textblock"><p>Entry point for Accelerender. </p>
 <p>Handles platform-specific Vulkan loader setup (macOS), initializes the <a class="el" href="classVulkanRenderer.html" title="Encapsulates a Vulkan-based rendering engine using RAII wrappers.">VulkanRenderer</a>, runs the rendering loop, and ensures proper cleanup in case of exceptions.</p>
 <dl class="section author"><dt>Authors</dt><dd>Finley Deevy, Eric Newton </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2025-11-11 (Updated) </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="ae66f6b31b5ad750f1fe042a706a4e3d4" name="ae66f6b31b5ad750f1fe042a706a4e3d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">&#9670;&#160;</a></span>main()</h2>
@@ -173,7 +172,6 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Entry point for the Accelerender application. </p>
-<p>Handles platform-specific Vulkan loader configuration (macOS), initializes the <a class="el" href="classVulkanRenderer.html" title="Encapsulates a Vulkan-based rendering engine using RAII wrappers.">VulkanRenderer</a> class, runs the main rendering loop, and performs exception-safe cleanup.</p>
 <dl class="section return"><dt>Returns</dt><dd>EXIT_SUCCESS if the application runs successfully, otherwise EXIT_FAILURE. </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>

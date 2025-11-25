@@ -117,7 +117,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="center"><img src="SwapChain_8hpp__dep__incl.png" border="0" usemap="#ainclude_2SwapChain_8hppdep" alt=""/></div>
 <map name="ainclude_2SwapChain_8hppdep" id="ainclude_2SwapChain_8hppdep">
 <area shape="rect" title="Declares the SwapChain class for encapsulating Vulkan swap chain creation and management." alt="" coords="5,5,179,31"/>
-<area shape="rect" href="SwapChain_8cpp.html" title=" " alt="" coords="20,79,164,104"/>
+<area shape="rect" href="SwapChain_8cpp.html" title="Implementation of Vulkan swap chain management for the renderer. Part of an in&#45;progress refactor to i..." alt="" coords="20,79,164,104"/>
 </map>
 </div>
 </div>
@@ -131,7 +131,7 @@ Classes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declares the <a class="el" href="classSwapChain.html">SwapChain</a> class for encapsulating Vulkan swap chain creation and management. </p>
 <p>The <b><a class="el" href="classSwapChain.html">SwapChain</a></b> class is designed to handle the setup, recreation, and cleanup of a Vulkan swap chain using the RAII (Resource Acquisition Is Initialization) pattern. It abstracts low-level Vulkan logic for presentation image handling, making the rendering pipeline more modular and maintainable.</p>
-<p>⚠️ <b>Note:</b> As of this version, the <code><a class="el" href="classSwapChain.html">SwapChain</a></code> class is <b>not yet integrated</b> into the main Vulkan rendering pipeline (<code><a class="el" href="main_8cpp.html" title="Entry point for the Accelerender Vulkan-based renderer.">main.cpp</a></code>). The current pipeline still uses legacy swap chain logic from the original <code>Vulkan</code> class. Integration will occur once refactoring is complete to support modularized components.</p>
+<p>⚠️ <b>Note:</b> As of this version, the <code><a class="el" href="classSwapChain.html">SwapChain</a></code> class is <b>not yet integrated</b> into the main Vulkan rendering pipeline (<code><a class="el" href="main_8cpp.html" title="Entry point for Accelerender.">main.cpp</a></code>). The current pipeline still uses legacy swap chain logic from the original <code>Vulkan</code> class. Integration will occur once refactoring is complete to support modularized components.</p>
 <p>Key responsibilities:</p><ul>
 <li>Create and manage the Vulkan swap chain</li>
 <li>Select optimal surface format, presentation mode, and extent</li>

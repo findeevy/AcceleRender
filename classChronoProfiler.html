@@ -219,8 +219,8 @@ Static Private Attributes</h2></td></tr>
 <p>Starts a new profiling frame. </p>
 <p>Begin a new profiling frame.</p>
 <p>Clears the previous frame's merged events and stores the reference start time. Call this once per frame, typically at the beginning of your render/update loop.</p>
-<p>This should be called at the start of each frame (e.g., game/render loop). Clears previous frame events and resets the total event counter.</p>
-<dl class="section note"><dt>Note</dt><dd>Locks are used here to safely clear the shared frameEvents vector. </dd></dl>
+<p>Should be called at the start of each frame (e.g., game/render loop). Clears previous frame events &amp; resets the total event counter.</p>
+<dl class="section note"><dt>Note</dt><dd>Locks are used to safely clear the shared frameEvents vector. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -261,7 +261,7 @@ Here is the caller graph for this function:</div>
 <p>Merges all thread-local events from all threads into a global frameEvents vector. Only here is a lock required (mergeMutex), ensuring minimal overhead during normal profiling.</p>
 <p>Merges thread-local buffers from all threads into 'frameEvents' for the current frame. Each thread-local buffer is cleared after merging.</p>
 <dl class="section note"><dt>Note</dt><dd>Locking occurs here to ensure thread-safe merging. </dd></dl>
-<p>&lt; Clear thread-local buffer for next frame</p>
+<p>&lt; clear thread-local buffer for next frame</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -457,9 +457,9 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Returns high-resolution current time in milliseconds. </p>
-<p>Get the current timestamp in milliseconds since the epoch.</p>
-<dl class="section return"><dt>Returns</dt><dd>High-resolution timestamp in milliseconds (double-precision)</dd></dl>
-<p>Uses 'std::chrono::high_resolution_clock' to provide accurate timing for profiling events. This is used internally to compute event durations. </p>
+<p>Get current timestamp in milliseconds (since the epoch.</p>
+<dl class="section return"><dt>Returns</dt><dd>High-resolution timestamp in milliseconds (double-precision).</dd></dl>
+<p>Uses 'std::chrono::high_resolution_clock' to provide accurate timing for profiling events. Used internally to compute event durations. </p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -578,17 +578,17 @@ Here is the caller graph for this function:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>Zone name (caller-owned string) </td></tr>
-    <tr><td class="paramname">color</td><td>Optional RGBA color for visualization (default 0x64C8FFFF) </td></tr>
+    <tr><td class="paramname">color</td><td>Optional RGBA color for visualization (default=0x64C8FFFF) </td></tr>
     <tr><td class="paramname">category</td><td>Optional string category for grouping zones in UI</td></tr>
   </table>
   </dd>
 </dl>
-<p>Creates an <a class="el" href="structChronoProfiler_1_1Event.html" title="Stores timing information for a single code zone.">Event</a> object and pushes it onto the thread-local vector. Duration is calculated later when '<a class="el" href="classChronoProfiler.html#addf1a09901b64fb3eb7bbd21913076b1" title="Ends the most recent profiling zone on this thread.">pushEventEnd()</a>' is called.</p>
-<dl class="section note"><dt>Note</dt><dd>Each thread registers its local buffer only once using a thread-local static lambda. </dd>
+<p>Creates an <a class="el" href="structChronoProfiler_1_1Event.html" title="Stores timing information for a single code zone.">Event</a> object and pushes it onto the thread-local vector. Duration is calculated when '<a class="el" href="classChronoProfiler.html#addf1a09901b64fb3eb7bbd21913076b1" title="Ends the most recent profiling zone on this thread.">pushEventEnd()</a>' is called.</p>
+<dl class="section note"><dt>Note</dt><dd>Each thread registers its local buffer only once using a thread-local static lambda.</dd>
 <dd>
 Prevents runaway growth using 'kMaxEventsPerThread'. </dd></dl>
-<p>&lt; Prevent runaway growth</p>
-<p>&lt; Duration unknown until <a class="el" href="classChronoProfiler.html#addf1a09901b64fb3eb7bbd21913076b1" title="Ends the most recent profiling zone on this thread.">pushEventEnd()</a></p>
+<p>&lt; prevent runaway growth</p>
+<p>&lt; duration unknown until <a class="el" href="classChronoProfiler.html#addf1a09901b64fb3eb7bbd21913076b1" title="Ends the most recent profiling zone on this thread.">pushEventEnd()</a></p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -794,8 +794,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Thread-local event list for each thread. </p>
-<p>&lt; std::stringstream for string formatting</p>
-<p>&lt; std::ofstream for file output std::setw for pretty JSON formatting &lt; External library for JSON export</p>
+<p>&lt; std::stringstream for string format</p>
+<p>&lt; std::ofstream for file output std::setw for JSON format &lt; external library for JSON export</p>
 <p>Thread-local event list for each thread. Each thread writes to its own vector to avoid locks. </p>
 
 </div>

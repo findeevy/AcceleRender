@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('SwapChain_8cpp.html',''); initResizabl
   <div class="headertitle"><div class="title">SwapChain.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implementation of Vulkan swap chain management for the renderer. Part of an in-progress refactor to isolate <a class="el" href="classSwapChain.html">SwapChain</a> functionality out of <a class="el" href="render_8cpp.html" title="VulkanRenderer class implementation for Accelerender.">render.cpp</a>...  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="SwapChain_8hpp_source.html">SwapChain.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="VulkanUtils_8hpp_source.html">../include/VulkanUtils.hpp</a>&quot;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
@@ -104,7 +107,7 @@ Include dependency graph for SwapChain.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="SwapChain_8cpp__incl.png" border="0" usemap="#asrc_2SwapChain_8cpp" alt=""/></div>
 <map name="asrc_2SwapChain_8cpp" id="asrc_2SwapChain_8cpp">
-<area shape="rect" title=" " alt="" coords="257,5,401,31"/>
+<area shape="rect" title="Implementation of Vulkan swap chain management for the renderer. Part of an in&#45;progress refactor to i..." alt="" coords="257,5,401,31"/>
 <area shape="rect" href="SwapChain_8hpp.html" title="Declares the SwapChain class for encapsulating Vulkan swap chain creation and management." alt="" coords="89,79,211,104"/>
 <area shape="rect" title=" " alt="" coords="5,152,68,177"/>
 <area shape="rect" href="VulkanUtils_8hpp.html" title="Provides utility functions for Vulkan operations (file I/O and image view creation)." alt="" coords="235,79,422,104"/>
@@ -117,6 +120,9 @@ Include dependency graph for SwapChain.cpp:</div>
 <area shape="rect" title=" " alt="" coords="397,152,455,177"/>
 </map>
 </div>
+</div><a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implementation of Vulkan swap chain management for the renderer. Part of an in-progress refactor to isolate <a class="el" href="classSwapChain.html">SwapChain</a> functionality out of <a class="el" href="render_8cpp.html" title="VulkanRenderer class implementation for Accelerender.">render.cpp</a>... </p>
+<dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classSwapChain.html">SwapChain</a> must be recreated when the window is resized or when the surface becomes invalid (e.g., VK_ERROR_OUT_OF_DATE_KHR). </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

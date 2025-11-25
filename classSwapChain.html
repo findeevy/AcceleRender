@@ -301,14 +301,13 @@ Here is the caller graph for this function:</div>
 <li>eImmediate: may present images immediately and can tear (not recommended).</li>
 <li>eFifo: guaranteed to be available on all platforms; behaves like vsync.</li>
 </ul>
-<p>We prefer mailbox when available, otherwise fallback to FIFO for portability.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">availablePresentModes</td><td>List of supported present modes returned by the driver. </td></tr>
+    <tr><td class="paramname">availablePresentModes</td><td>List of supported present modes returned by the driver </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The chosen vk::PresentModeKHR (mailbox preferred, otherwise FIFO). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The chosen vk::PresentModeKHR (mailbox preferred, otherwise FIFO) </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -351,14 +350,13 @@ Here is the caller graph for this function:</div>
 <p>Preferred format:</p><ul>
 <li>VK_FORMAT_B8G8R8A8_SRGB with sRGB nonlinear color space for correct color reproduction on most platforms.</li>
 </ul>
-<p>If that specific format is not available we return the first available option. In a more advanced implementation you could score formats based on color depth, linear vs sRGB, and device support.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">availableFormats</td><td>List of supported surface formats. </td></tr>
+    <tr><td class="paramname">availableFormats</td><td>List of supported surface formats </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The chosen vk::SurfaceFormatKHR. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The chosen vk::SurfaceFormatKHR </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -433,10 +431,9 @@ Here is the caller graph for this function:</div>
 <li>Construct the RAII-wrapped vk::raii::SwapchainKHR object.</li>
 <li>Retrieve raw swap chain images and create RAII-wrapped image objects so we can create corresponding image views (one per swap chain image).</li>
 </ol>
-<p>Important notes:</p><ul>
-<li>This function can throw on Vulkan errors (vk::SystemError) when creating the swapchain or image views. Callers are responsible for handling exceptions appropriately.</li>
-<li>RAII objects hold references to the device; do not destroy the device before the swapchain.</li>
-</ul>
+<dl class="section note"><dt>Note</dt><dd>This function can throw on Vulkan errors (vk::SystemError) when creating the swapchain or image views. Callers are responsible for handling exceptions appropriately. </dd>
+<dd>
+RAII objects hold references to the device; do not destroy the device before the swapchain.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">vk::SystemError</td><td>if swap chain or image view creation fails. </td></tr>
@@ -569,7 +566,6 @@ Here is the caller graph for this function:</div>
 <p>Typical usage pattern:</p><ul>
 <li>On framebuffer resize, call <a class="el" href="classSwapChain.html#a09c6d787081cc82967bb8caa06c3b7d1" title="Recreates the swap chain, typically after window resizing or surface loss.">recreate()</a> to re-query surface capabilities and rebuild the swap chain and image views to match the new window size.</li>
 </ul>
-<p>Note: More robust implementations may need to wait for the device to become idle or to free other resources (framebuffers, pipelines) that depend on the swapchain.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classSwapChain.html#ab2426fbd3ecfd79dae03a5c02f0405ee" title="Creates the Vulkan swap chain and associated image views.">create()</a> </dd>
 <dd>
 <a class="el" href="classSwapChain.html#afb3d489debe2016d03c191db7c264014" title="Cleans up swap chain resources before destruction or recreation.">cleanup()</a> </dd></dl>

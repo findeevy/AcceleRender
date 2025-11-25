@@ -96,6 +96,9 @@ $(document).ready(function(){initNavTree('namespacevkutils.html',''); initResiza
   <div class="headertitle"><div class="title">vkutils Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Collection of utility functions for Vulkan resource management.  
+<a href="namespacevkutils.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -106,7 +109,9 @@ Functions</h2></td></tr>
 <tr class="memdesc:a2feaea61736d6e4b9be257b4fe74d324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a Vulkan image view for a given image resource.  <br /></td></tr>
 <tr class="separator:a2feaea61736d6e4b9be257b4fe74d324"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Collection of utility functions for Vulkan resource management. </p>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a id="a2feaea61736d6e4b9be257b4fe74d324" name="a2feaea61736d6e4b9be257b4fe74d324"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2feaea61736d6e4b9be257b4fe74d324">&#9670;&#160;</a></span>createImageView()</h2>
 
@@ -176,7 +181,7 @@ Functions</h2></td></tr>
 vk::ImageAspectFlags</dd></dl>
 <div class="fragment"><div class="line">vk::raii::ImageView imageView = <a class="code hl_function" href="namespacevkutils.html#a2feaea61736d6e4b9be257b4fe74d324">vkutils::createImageView</a>(device, image,</div>
 <div class="line">format, vk::ImageAspectFlagBits::eColor);</div>
-<div class="ttc" id="anamespacevkutils_html_a2feaea61736d6e4b9be257b4fe74d324"><div class="ttname"><a href="namespacevkutils.html#a2feaea61736d6e4b9be257b4fe74d324">vkutils::createImageView</a></div><div class="ttdeci">vk::raii::ImageView createImageView(const vk::raii::Device &amp;device, const vk::raii::Image &amp;image, vk::Format format, vk::ImageAspectFlags aspectFlags, uint32_t mipLevels)</div><div class="ttdoc">Creates a Vulkan image view for a given image resource.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:67</div></div>
+<div class="ttc" id="anamespacevkutils_html_a2feaea61736d6e4b9be257b4fe74d324"><div class="ttname"><a href="namespacevkutils.html#a2feaea61736d6e4b9be257b4fe74d324">vkutils::createImageView</a></div><div class="ttdeci">vk::raii::ImageView createImageView(const vk::raii::Device &amp;device, const vk::raii::Image &amp;image, vk::Format format, vk::ImageAspectFlags aspectFlags, uint32_t mipLevels)</div><div class="ttdoc">Creates a Vulkan image view for a given image resource.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:81</div></div>
 </div><!-- fragment --> <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2AcceleRender_2AcceleRender_2src_2VulkanUtils_8cpp-example.html#a1">/home/runner/work/AcceleRender/AcceleRender/src/VulkanUtils.cpp</a>.</dd>
 </dl>
 <div class="dynheader">
@@ -236,7 +241,7 @@ Here is the caller graph for this function:</div>
 <dl class="section note"><dt>Note</dt><dd>Commonly used to load SPIR-V shader bytecode for Vulkan pipeline creation.</dd></dl>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> vertShaderCode = <a class="code hl_function" href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a>(<span class="stringliteral">&quot;shaders/vert.spv&quot;</span>);</div>
 <div class="line"><span class="keyword">auto</span> fragShaderCode = <a class="code hl_function" href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a>(<span class="stringliteral">&quot;shaders/frag.spv&quot;</span>);</div>
-<div class="ttc" id="anamespacevkutils_html_af90786242f1198844bc136f954c63897"><div class="ttname"><a href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a></div><div class="ttdeci">std::vector&lt; char &gt; readFile(const std::string &amp;filename)</div><div class="ttdoc">Reads a binary file (e.g., SPIR-V shader) into a vector of bytes.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:26</div></div>
+<div class="ttc" id="anamespacevkutils_html_af90786242f1198844bc136f954c63897"><div class="ttname"><a href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a></div><div class="ttdeci">std::vector&lt; char &gt; readFile(const std::string &amp;filename)</div><div class="ttdoc">Reads a binary file (e.g., SPIR-V shader) into a vector of bytes.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:40</div></div>
 </div><!-- fragment --> <dl class="section examples"><dt>Examples</dt><dd><a class="el" href="_2home_2runner_2work_2AcceleRender_2AcceleRender_2src_2VulkanUtils_8cpp-example.html#a0">/home/runner/work/AcceleRender/AcceleRender/src/VulkanUtils.cpp</a>.</dd>
 </dl>
 <div class="dynheader">

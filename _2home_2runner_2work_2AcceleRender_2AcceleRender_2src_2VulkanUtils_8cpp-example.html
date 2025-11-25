@@ -99,21 +99,22 @@ $(document).ready(function(){initNavTree('_2home_2runner_2work_2AcceleRender_2Ac
 <p>This utility function is typically used to load SPIR-V shader bytecode or other binary assets into memory. The file is opened in binary mode and read into a contiguous buffer of bytes.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">filename</td><td>Path to the file to read (e.g., "shaders/vert.spv"). </td></tr>
+    <tr><td class="paramname">filename</td><td>Path to the file to read (e.g., "shaders/vert.spv") </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A std::vector&lt;char&gt; containing the raw file bytes. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A std::vector&lt;char&gt; containing the raw file bytes </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>if the file cannot be opened.</td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>if the file cannot be opened</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Uses std::ios::ate to determine the file size efficiently.</dd></dl>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> vertShaderCode = <a id="a0" name="a0"></a><a class="code hl_function" href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a>(<span class="stringliteral">&quot;shaders/vert.spv&quot;</span>);</div>
-<div class="ttc" id="anamespacevkutils_html_af90786242f1198844bc136f954c63897"><div class="ttname"><a href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a></div><div class="ttdeci">std::vector&lt; char &gt; readFile(const std::string &amp;filename)</div><div class="ttdoc">Reads a binary file (e.g., SPIR-V shader) into a vector of bytes.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:26</div></div>
-</div><!-- fragment --><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;../include/VulkanUtils.hpp&quot;</span></div>
+<div class="ttc" id="anamespacevkutils_html_af90786242f1198844bc136f954c63897"><div class="ttname"><a href="namespacevkutils.html#af90786242f1198844bc136f954c63897">vkutils::readFile</a></div><div class="ttdeci">std::vector&lt; char &gt; readFile(const std::string &amp;filename)</div><div class="ttdoc">Reads a binary file (e.g., SPIR-V shader) into a vector of bytes.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:40</div></div>
+</div><!-- fragment --><div class="fragment"><div class="line"> </div>
+<div class="line"><span class="preprocessor">#include &quot;../include/VulkanUtils.hpp&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;fstream&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
@@ -159,9 +160,9 @@ $(document).ready(function(){initNavTree('_2home_2runner_2work_2AcceleRender_2Ac
 <div class="line">  <span class="keywordflow">return</span> vk::raii::ImageView(device, viewInfo);</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">} <span class="comment">// namespace vkutils</span></div>
-<div class="ttc" id="anamespacevkutils_html"><div class="ttname"><a href="namespacevkutils.html">vkutils</a></div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:7</div></div>
-<div class="ttc" id="anamespacevkutils_html_a2feaea61736d6e4b9be257b4fe74d324"><div class="ttname"><a href="namespacevkutils.html#a2feaea61736d6e4b9be257b4fe74d324">vkutils::createImageView</a></div><div class="ttdeci">vk::raii::ImageView createImageView(const vk::raii::Device &amp;device, const vk::raii::Image &amp;image, vk::Format format, vk::ImageAspectFlags aspectFlags, uint32_t mipLevels)</div><div class="ttdoc">Creates a Vulkan image view for a given image resource.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:67</div></div>
+<div class="line">} <span class="comment">// end of namespace vkutils</span></div>
+<div class="ttc" id="anamespacevkutils_html"><div class="ttname"><a href="namespacevkutils.html">vkutils</a></div><div class="ttdoc">Collection of utility functions for Vulkan resource management.</div></div>
+<div class="ttc" id="anamespacevkutils_html_a2feaea61736d6e4b9be257b4fe74d324"><div class="ttname"><a href="namespacevkutils.html#a2feaea61736d6e4b9be257b4fe74d324">vkutils::createImageView</a></div><div class="ttdeci">vk::raii::ImageView createImageView(const vk::raii::Device &amp;device, const vk::raii::Image &amp;image, vk::Format format, vk::ImageAspectFlags aspectFlags, uint32_t mipLevels)</div><div class="ttdoc">Creates a Vulkan image view for a given image resource.</div><div class="ttdef"><b>Definition:</b> VulkanUtils.cpp:81</div></div>
 </div><!-- fragment --> </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

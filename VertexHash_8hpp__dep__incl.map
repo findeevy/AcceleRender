@@ -1,6 +1,6 @@
 <map id="include/VertexHash.hpp" name="include/VertexHash.hpp">
 <area shape="rect" id="node1" title="Provides a &#39;std::hash&#39; specialization for the Vertex struct." alt="" coords="37,5,213,31"/>
 <area shape="rect" id="node2" href="$render_8hpp.html" title=" " alt="" coords="53,79,196,104"/>
-<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for the Accelerender Vulkan&#45;based renderer." alt="" coords="5,152,111,177"/>
+<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for Accelerender." alt="" coords="5,152,111,177"/>
 <area shape="rect" id="node4" href="$render_8cpp.html" title="VulkanRenderer class implementation for Accelerender." alt="" coords="135,152,248,177"/>
 </map>

@@ -1,8 +1,8 @@
 <map id="include/VulkanUtils.hpp" name="include/VulkanUtils.hpp">
 <area shape="rect" id="node1" title="Provides utility functions for Vulkan operations (file I/O and image view creation)." alt="" coords="205,5,380,31"/>
 <area shape="rect" id="node2" href="$render_8hpp.html" title=" " alt="" coords="53,79,196,104"/>
-<area shape="rect" id="node5" href="$SwapChain_8cpp.html" title=" " alt="" coords="221,79,365,104"/>
-<area shape="rect" id="node6" href="$VulkanUtils_8cpp.html" title=" " alt="" coords="389,79,535,104"/>
-<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for the Accelerender Vulkan&#45;based renderer." alt="" coords="5,152,111,177"/>
+<area shape="rect" id="node5" href="$SwapChain_8cpp.html" title="Implementation of Vulkan swap chain management for the renderer. Part of an in&#45;progress refactor to i..." alt="" coords="221,79,365,104"/>
+<area shape="rect" id="node6" href="$VulkanUtils_8cpp.html" title="Utility helper functions for common Vulkan operations." alt="" coords="389,79,535,104"/>
+<area shape="rect" id="node3" href="$main_8cpp.html" title="Entry point for Accelerender." alt="" coords="5,152,111,177"/>
 <area shape="rect" id="node4" href="$render_8cpp.html" title="VulkanRenderer class implementation for Accelerender." alt="" coords="135,152,248,177"/>
 </map>
