@@ -3,7 +3,7 @@
 </p>
 
 **<code>AcceleRender</code>** is a modern, Vulkan-driven real-time rendering engine written in **C++20** using full RAII abstractions. <br> <br>
-It manages the *entire GPU rendering pipeline* — from device selection and swap chain orchestration to shader compilation, texture streaming, and multi-frame synchronization — while exposing a clean, high-level API for rendering 3D scenes efficiently.
+It manages the entire GPU rendering pipeline while exposing a clean, high-level API for rendering 3D scenes efficiently.
 
 ## Live Demo
 
@@ -61,7 +61,7 @@ Compatible with:
 # clean old build artifacts
 make clean
 
-# compile shaders only
+# compile shaders
 make shaders
 
 # build the project
@@ -75,12 +75,12 @@ make docs
 ```
 
 ## Dependencies
-- **[Vulkan SDK](https://www.vulkan.org)** — core rendering backend
-- **[GLFW](https://www.glfw.org)** — windowing + Vulkan surface creation
-- **[GLM](https://github.com/g-truc/glm)** — math library (matrices, vectors, transforms)
-- **[STB Image](https://github.com/nothings/stb)** — texture loading
-- **[TinyOBJLoader](https://github.com/tinyobjloader/tinyobjloader)** — mesh loading
-- **[nlohmann/json](https://github.com/nlohmann/json)** — config / profiling output
+- **[Vulkan SDK](https://www.vulkan.org)** -> core rendering backend
+- **[GLFW](https://www.glfw.org)** —> windowing + Vulkan surface creation
+- **[GLM](https://github.com/g-truc/glm)** -> math library (matrices, vectors, transforms)
+- **[STB Image](https://github.com/nothings/stb)** -> texture loading
+- **[TinyOBJLoader](https://github.com/tinyobjloader/tinyobjloader)** -> mesh loading
+- **[nlohmann/json](https://github.com/nlohmann/json)** -> config / profiling output
 
 ## Documentation & Design
 
