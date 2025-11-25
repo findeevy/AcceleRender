@@ -151,7 +151,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="comment">// in render loop, after ChronoProfiler::endFrame()</span></div>
 <div class="line">profilerUI.update();</div>
 <div class="line">profilerUI.render();</div>
-<div class="ttc" id="aclassProfilerUI_html"><div class="ttname"><a href="classProfilerUI.html">ProfilerUI</a></div><div class="ttdoc">Console-based ASCII profiler UI.</div><div class="ttdef"><b>Definition:</b> ProfilerUI.hpp:123</div></div>
+<div class="ttc" id="aclassProfilerUI_html"><div class="ttname"><a href="classProfilerUI.html">ProfilerUI</a></div><div class="ttdoc">Console-based ASCII profiler UI.</div><div class="ttdef"><b>Definition:</b> ProfilerUI.hpp:121</div></div>
 </div><!-- fragment --><dl class="section user"><dt>Thread-safety</dt><dd>Methods '<a class="el" href="classProfilerUI.html#a32f596844211976acd4245b017ee3cee" title="Pull the latest frame events from ChronoProfiler and update internal state.">update()</a>' and '<a class="el" href="classProfilerUI.html#a443b38dd8485bf35f3d3b40e1398803b" title="Render the current frame and aggregated statistics to stdout.">render()</a>' are internally synchronized with a 'std::mutex' ('uiMutex') so they may be called from different threads as long as the calls themselves follow the profiler lifecycle (i.e. <a class="el" href="classProfilerUI.html#a32f596844211976acd4245b017ee3cee" title="Pull the latest frame events from ChronoProfiler and update internal state.">update()</a> after endFrame()).</dd></dl>
 <dl class="section user"><dt>Design decisions</dt><dd><ul>
 <li>Aggregated stats are cumulative (all-time). If you prefer sliding-window aggregation, change 'aggregatedStats' maintenance in '<a class="el" href="classProfilerUI.html#a32f596844211976acd4245b017ee3cee" title="Pull the latest frame events from ChronoProfiler and update internal state.">update()</a>'.</li>
@@ -235,7 +235,7 @@ Private Attributes</h2></td></tr>
 <p>Produces terminal output such as:</p>
 <p>''' === Frame 140 === updateScene ████████████ 1.52 ms [MainThread] drawFrame ████████████████████████ 3.40 ms [RenderThread]</p>
 <p>&ndash; Aggregated Stats &ndash; Zone Avg(ms) Max(ms) Count updateScene 1.50 2.02 140 drawFrame 3.38 4.02 140 ''' </p>
-<p>&lt; Use absolute frame count</p>
+<p>&lt; use absolute frame count</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -363,7 +363,7 @@ Here is the caller graph for this function:</div>
   </table>
   </dd>
 </dl>
-<p>&lt; Scale duration into bar length</p>
+<p>&lt; scale duration into bar length</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -419,9 +419,9 @@ Here is the caller graph for this function:</div>
 <li>Manages max history size</li>
 <li>Updates aggregated statistics for zone durations </li>
 </ul>
-<p>&lt; Ensure thread safety</p>
-<p>&lt; Profiler provides merged events</p>
-<p>&lt; Drop oldest frame</p>
+<p>&lt; ensure thread safety</p>
+<p>&lt; profiler provides merged events</p>
+<p>&lt; drop oldest frame</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
